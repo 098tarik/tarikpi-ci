@@ -1,0 +1,25 @@
+name: Update Raspberry Pi
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Runs daily at 4 AM UTC
+  workflow_dispatch:       # Allows manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and update Pi
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USER }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          script: |
+            sudo apt update
+            sudo apt upgrade -y
+            sudo apt autoremove -y
+            if [ -f /var/run/reboot-required ]; then
+              sudo k3s kubectl drain $(hostname) --ignore-daemonsets --delete-emptydir-data || true
+              sudo reboot
+            fi
