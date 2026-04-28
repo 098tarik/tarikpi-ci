@@ -9,6 +9,12 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+
       - name: SSH and update Pi
         uses: appleboy/ssh-action@v1
         with:
